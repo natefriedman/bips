@@ -78,6 +78,7 @@ Now a customer, Carol, wants to order a brand new phone for 0.01 BTC on Manny's 
 * PROCCO can now show the Bitcoin Payment Checkout page.
 * Carla pays.
 * MYCOIN, under its own policy (typically after 6 confirmations), credits Manny's account of 0.01 BTC and simultaneously creates a market sell order of 0.007 BTC on behalf of Manny.   MYCOIN notifies PROCCO that the payment was received via the webhook.
+* PROCCO marks the payment as paid.   Manny sees the order has been paid and processes the order as usual.
 
 ==Specification==
 
