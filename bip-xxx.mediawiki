@@ -46,13 +46,15 @@ Their customers can decide which payment processor solution they prefer, while t
 
 The merchant log in to its exchange website, go into "Address sources" section of it, an click on "Create a new address source".
 
-The address source creation wizard asks him questions about what to do when crypto currency is sent to this the address source. (Cryptocurrency, Market sell order, limit order of past day average etc...)
+The address source creation wizard asks him questions about what to do when crypto currency is sent to this the address source. (Cryptocurrency, Market sell order, limit order of past day average etc...).
+
+The wizard will also request webhook information so the exchange can notify the payment processor that a payment has been received to the address source.
 
 The merchant receives an "address source URI" which they can input inside the payment processor.
 
 An exchange compatible with the Crypto Open Exchange Protocol would reply to any HTTP POST request to this  "address source URI" returning the following information (more details in the Specification part)
 
-# A deposit address for accepting a payment
+# A deposit address for accepting a payment.  This address will be uniquely generated for each POST request.
 # The current rate
 # Optional: If the exchange is willing to take the risk of rate fluctuation, until when this rate is guaranteed and under which conditions.
 
@@ -65,6 +67,7 @@ An exchange compatible with the Crypto Open Exchange Protocol would reply to any
 * Manny is based in Canada and already has an account on the exchange "MYCOIN" which supports the Crypto Open Exchange Protocol.
 * Manny connects to the exchange website, and creates a new address source.
 * In the configuration screen of the address source, for each payment sent to this address source, Manny decides to keep 30% in Bitcoin and place a market sell order for the remaining 70% of the amount.
+* Manny provides "PROCCO's" webhook endpoint that so "PROCCO" is notified when payments are successfully received. 
 * "MYCOIN" creates the address source, and gives the "address source URI" to the merchant. (e.g. https://example.com/addresssources/abd29ddn92)
 * Manny copies the address source URI and goes inside "PROCCO" settings, and configures his store to use this address source URI.
 
@@ -74,8 +77,7 @@ Now a customer, Carol, wants to order a brand new phone for 0.01 BTC on Manny's 
 * PROCCO queries the "address source URI" and retrieves the rate, the expiration of this rate and conditions.
 * PROCCO can now show the Bitcoin Payment Checkout page.
 * Carla pays.
-* PROCCO marks the payment as paid and redirects to the e-commerce website.
-* MYCOIN, under its own policy (typically after 6 confirmations), credits Manny's account of 0.01 BTC and simultaneously creates a market sell order of 0.007 BTC on behalf of Manny.
+* MYCOIN, under its own policy (typically after 6 confirmations), credits Manny's account of 0.01 BTC and simultaneously creates a market sell order of 0.007 BTC on behalf of Manny.   MYCOIN notifies PROCCO that the payment was received via the webhook.
 
 ==Specification==
 
@@ -111,7 +113,23 @@ If the exchange guarantees the rate:
     }
 
 
-The payment processor is responsible for giving feedback to the customer if the fees of the received transaction are not enough to guarantee the rate.
+The exchange sends the following POST to the processor's webhook URI:
+
+  {
+        "depositAddress" : "13....abd",
+        "currencyCode" : "CAD",
+        "cryptoCurrencyCode" : "BTC",
+        "rateReceived" : "15600",
+        "cryptoAmountReceived" : "0.01",
+        "receivedTimestamp" : timestamp,
+        "confirmedTimestamp" : timestamp,
+        # When exchange provided a guarenteed rate
+        "guarenteedRateReceived" : "false",
+        # When exchange provided a guarenteed rate and the conditions were not met
+        "conditionFailure" : "Received after window"
+  }
+
+The payment processor will use the postback information to determine if the invoice is paid and to alert the merchant and customer if the payment amount is wrong, it was sent too late, confirmed too late, or any other issues.
 
 ==Note on adoption==
 
