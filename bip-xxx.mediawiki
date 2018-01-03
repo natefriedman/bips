@@ -129,7 +129,7 @@ The exchange sends the following POST to the processor's webhook URI:
         "conditionFailure" : "Received after window"
   }
 
-The payment processor will use the postback information to determine if the invoice is paid and to alert the merchant and customer if the payment amount is wrong, it was sent too late, confirmed too late, or any other issues.
+The payment processor will use the postback information to determine if the invoice is paid and to alert the merchant and customer to any issues (e.g. if the payment amount is wrong, it was sent/confirmed too late, etc).
 
 ==Note on adoption==
 
