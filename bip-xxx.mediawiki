@@ -46,7 +46,7 @@ Their customers can decide which payment processor solution they prefer, while t
 
 The merchant log in to its exchange website, go into "Address sources" section of it, an click on "Create a new address source".
 
-The address source creation wizard asks him questions about what to do when crypto currency is sent to this the address source. (Cryptocurrency, Market sell order, limit order of past day average etc...).
+The address source creation wizard asks him questions about what to do when crypto currency is sent to this the address source. (Cryptocurrency, Market sell order, limit order of past day average etc...)
 
 The wizard will also request webhook information so the exchange can notify the payment processor that a payment has been received to the address source.
 
