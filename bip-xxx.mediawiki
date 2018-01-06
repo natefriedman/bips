@@ -48,7 +48,7 @@ The merchant log in to its exchange website, go into "Address sources" section o
 
 The address source creation wizard asks him questions about what to do when crypto currency is sent to this the address source. (Cryptocurrency, Market sell order, limit order of past day average etc...)
 
-The wizard will also request webhook information so the exchange can notify the payment processor that a payment has been received to the address source.
+The wizard will also request webhook information so the exchange can notify the payment processor when a payment is made and when it is confirmed.
 
 The merchant receives an "address source URI" which they can input inside the payment processor.
 
@@ -67,7 +67,7 @@ An exchange compatible with the Crypto Open Exchange Protocol would reply to any
 * Manny is based in Canada and already has an account on the exchange "MYCOIN" which supports the Crypto Open Exchange Protocol.
 * Manny connects to the exchange website, and creates a new address source.
 * In the configuration screen of the address source, for each payment sent to this address source, Manny decides to keep 30% in Bitcoin and place a market sell order for the remaining 70% of the amount.
-* Manny provides "PROCCO's" webhook endpoint that so "PROCCO" is notified when payments are successfully received. 
+* Manny provides "PROCCO's" webhook endpoint that so "PROCCO" is notified when payments have been made and confirmed. 
 * "MYCOIN" creates the address source, and gives the "address source URI" to the merchant. (e.g. https://example.com/addresssources/abd29ddn92)
 * Manny copies the address source URI and goes inside "PROCCO" settings, and configures his store to use this address source URI.
 
@@ -76,9 +76,10 @@ Now a customer, Carol, wants to order a brand new phone for 0.01 BTC on Manny's 
 * The E-Commerce website plugin requests the creation of an invoice from PROCCO. 
 * PROCCO queries the "address source URI" and retrieves the rate, the expiration of this rate and conditions.
 * PROCCO can now show the Bitcoin Payment Checkout page.
-* Carla pays.
-* MYCOIN, under its own policy (typically after 6 confirmations), credits Manny's account of 0.01 BTC and simultaneously creates a market sell order of 0.007 BTC on behalf of Manny.   MYCOIN notifies PROCCO that the payment was received via the webhook.
-* PROCCO marks the payment as paid.   Manny sees the order has been paid and processes the order as usual.
+* Carla pays.  MYCOIN sees the payment in the mempool and notifies PROCCO that a payment has been made via the webhook.
+* PROCCO updates the invoice to acknowledge that a payment has been sent.  
+* MYCOIN, under its own policy (typically after 6 confirmations), credits Manny's account of 0.01 BTC and simultaneously creates a market sell order of 0.007 BTC on behalf of Manny.   MYCOIN notifies PROCCO that the payment was confirmed and finalized via the webhook.
+* PROCCO marks the payment as paid/finalized.   Manny sees the order has been paid and processes the order as usual.
 
 ==Specification==
 
@@ -114,7 +115,19 @@ If the exchange guarantees the rate:
     }
 
 
-The exchange sends the following POST to the processor's webhook URI:
+When the payment hits the mempool, the exchange sends the following POST to the processor's webhook URI:
+
+  {
+        "depositAddress" : "13....abd",
+        "cryptoAmountReceived" : "0.01",
+        "receivedTimestamp" : timestamp,
+        "rateGuarenteedInEffect" : "false",
+        # When exchange provided a guarenteed rate and the conditions were not met
+        "conditionFailure" : "Received after window"
+  }
+
+
+When the payment is considered confirmed, the exchange sends the following POST to the processor's webhook URI:
 
   {
         "depositAddress" : "13....abd",
