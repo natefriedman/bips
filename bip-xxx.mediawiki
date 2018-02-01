@@ -14,7 +14,7 @@
 
 ==Abstract==
 
-A simple protocol for decoupling payment processor solutions from exchanges.
+A simple protocol that allows merchants to decouple payment processor solutions from exchanges while mitigating exchange rate risks.   The protocol supports both onchain and Lightning Network payments.
 
 ==Motivation==
 
@@ -36,7 +36,7 @@ The centralized solution has two issues:
 # It locks-in the merchant to a particular payment processor whose intentions might not be aligned (e.g. Bitpay who tried to redefine Bitcoin as being a different chain, without merchant approval)
 # It has to deal with local regulations (e.g. Bitpay does not provide fiat CAD to canadian merchants)
 
-The goal of this BIP is to specify a simple protocol which makes possible decoupling of payment processors from exchanges.
+The goal of this BIP is to specify a simple protocol which makes possible decoupling of payment processors from exchanges so the merchant gets the flexibility of a self-hosted solutions with the volatility mitigation benefits of a centralized solution
 
 We believe this BIP will gather a lot of interest among local exchanges which do not have the resources to develop their own payment solutions.
 
@@ -44,9 +44,25 @@ Their customers can decide which payment processor solution they prefer, while t
 
 ==Summary==
 
+The Crypto Open Exchange Protocol (COX) provides a standard way for exchanges to publish exchange rate information, to facilitate incoming deposits to exchanges, and to hedhe automatically sell cryptocurrencies for fiat.     This allows the payment processor to present accurately denominated cryptocurrency invoices, confirm that a payment was received, and minimize exchange risk by converting the payment quickly.  
+
+The protocol enables the customer to deposit into the merchant’s exchange account directly allowing Payment Processor to leverage the exchange’s bitcoin infrastructure and avoid fees associated with extra transactions.
+
+For onchain payments, the exchange generates the receiving address and payments sent to that address are credited to the merchant’s exchange account.  Lightning Network (LN) payments could be handled in the same way.  
+
+For merchants who prefer to maintain their own wallets/coin infrastructure, COX allows them to mitigate the exchange risk by initiating sell orders when funds are received.  For merchants using LN channels, this allows them to move out of cryptocurrency without closing the channel.   
+
+The protocol is works with onchain payments as well as.   In both cases, the exchange generates the receiving address 
+
+Two LN configurations are accounted for in the design: 
+1.	The merchant leverages the exchange’s LN channel. The merchant does not have to maintain their own LN channel or bitcoin infrastructure.
+2.	The merchant opens their own LN channel and their self-hosted Payment Processor creates LN invoices directly.   The merchant would control their own wallet and would use COXS to sell crypto as needed to mitigate exchange rate risk.  The exchange may or may not operate a LN node.
+
+===COX Setup===
+
 The merchant log in to its exchange website, go into "Address sources" section of it, an click on "Create a new address source".
 
-The address source creation wizard asks him questions about what to do when crypto currency is sent to this the address source. (Cryptocurrency, Market sell order, limit order of past day average etc...)
+The address source creation wizard asks him questions about what to do when crypto currency is sent to this the address source. (Cryptocurrency, Market sell order, limit order of past day average etc...).  The merchant would specify whether the exchange will provide onchain or LN addresses.
 
 The wizard will also request webhook information so the exchange can notify the payment processor when a payment is made and when it is confirmed.
 
