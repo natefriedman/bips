@@ -58,7 +58,7 @@ Two LN configurations are accounted for in the design:
 1.	The merchant leverages the exchange’s LN channel. The merchant does not have to maintain their own LN channel or bitcoin infrastructure.
 2.	The merchant opens their own LN channel and their self-hosted Payment Processor creates LN invoices directly.   The merchant would control their own wallet and would use COXS to sell crypto as needed to mitigate exchange rate risk.  The exchange may or may not operate a LN node.
 
-===COX Setup===
+===Setup===
 
 The merchant log in to its exchange website, go into "Address sources" section of it, an click on "Create a new address source".
 
@@ -76,11 +76,9 @@ An exchange compatible with the Crypto Open Exchange Protocol would reply to any
 
 <img src="bip-xxx/overview.png"></img>
 
-===Case I: Merchant accepts onchain payments and leverages exchange=== 
+===Case I: Onchain payments=== 
 
 In this case the merchant’s payment process queries the exchange to get current rate information and a destination address.   The exchange notifies the payment processor when payment is received.  The exchange converts the bitcoin according to rules setup during the configuration.
-
-====Interaction====
 
 The setup:
 
@@ -103,13 +101,13 @@ Now a customer, Carol, wants to order a brand new phone for $500 CAD on Manny's 
 * MYCOIN, under its own policy (typically after 6 confirmations), credits Manny's account of 0.01 BTC and simultaneously creates a market sell order of 0.007 BTC on behalf of Manny.   MYCOIN notifies PROCCO that the payment was confirmed and finalized via the webhook.
 * PROCCO marks the payment as paid/finalized.   Manny sees the order has been paid and processes the order as usual.
 
-===Case II: Merchant uses exchange’s LN infrastructure to accept LN payments=== 
+===Case II: Merchant uses exchange’s LN=== 
 
 In this case, the Payment Processor requests a LN address from the exchange.  The exchange keeps the Payment Processor up-to-date on payment status and sells the funds as configured.
 
 The steps are identical to Case I except LN addresses are sent instead of Bitcoin.
 
-===Case III: Merchant accepts payments via their own LN setup===
+===Case III: Merchant uses their own LN===
 
 In this case, the Merchant receives payments via their own LN channels.   COX is used to mitigate exchange risk by initiating sell orders on the merchant’s exchange account.  The exchange may offer the merchant the ability to short bitcoin so as they accumulate bitcoin in their channel their overall position remains the same.
 
