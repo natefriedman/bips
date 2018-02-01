@@ -76,7 +76,13 @@ An exchange compatible with the Crypto Open Exchange Protocol would reply to any
 
 <img src="bip-xxx/overview.png"></img>
 
-===Interaction===
+===Case I: Merchant accepts onchain payments and leverages exchange=== 
+
+In this case the merchant’s payment process queries the exchange to get current rate information and a destination address.   The exchange notifies the payment processor when payment is received.  The exchange converts the bitcoin according to rules setup during the configuration.
+
+====Interaction====
+
+The setup:
 
 * Manny (the "merchant") wants to accept Bitcoin payments on his e-commerce website.
 * Manny chooses the payment processor "PROCCO" which has a powerful plugin for his e-commerce website.
@@ -87,7 +93,7 @@ An exchange compatible with the Crypto Open Exchange Protocol would reply to any
 * "MYCOIN" creates the address source, and gives the "address source URI" to the merchant. (e.g. https://example.com/addresssources/abd29ddn92)
 * Manny copies the address source URI and goes inside "PROCCO" settings, and configures his store to use this address source URI.
 
-Now a customer, Carol, wants to order a brand new phone for 0.01 BTC on Manny's store and decides to pay in Bitcoin.
+Now a customer, Carol, wants to order a brand new phone for $500 CAD on Manny's store and decides to pay in Bitcoin.
 
 * The E-Commerce website plugin requests the creation of an invoice from PROCCO. 
 * PROCCO queries the "address source URI" and retrieves the rate, the expiration of this rate and conditions.
@@ -97,9 +103,42 @@ Now a customer, Carol, wants to order a brand new phone for 0.01 BTC on Manny's 
 * MYCOIN, under its own policy (typically after 6 confirmations), credits Manny's account of 0.01 BTC and simultaneously creates a market sell order of 0.007 BTC on behalf of Manny.   MYCOIN notifies PROCCO that the payment was confirmed and finalized via the webhook.
 * PROCCO marks the payment as paid/finalized.   Manny sees the order has been paid and processes the order as usual.
 
+===Case II: Merchant uses exchange’s LN infrastructure to accept LN payments=== 
+
+In this case, the Payment Processor requests a LN address from the exchange.  The exchange keeps the Payment Processor up-to-date on payment status and sells the funds as configured.
+
+The steps are identical to Case I except LN addresses are sent instead of Bitcoin.
+
+===Case III: Merchant accepts payments via their own LN setup===
+
+In this case, the Merchant receives payments via their own LN channels.   COX is used to mitigate exchange risk by initiating sell orders on the merchant’s exchange account.  The exchange may offer the merchant the ability to short bitcoin so as they accumulate bitcoin in their channel their overall position remains the same.
+
+The setup would be generally the same as Case I, except the configuration might take the merchant through the selection of costs and reasonable limits to ensure the merchant understands the risks and bounds them.   The setup of this case would primarily take place on the payment processor side as that side would determine when and how much selling of bitcoin will occur.
+
+Now a customer, Carol, wants to order a brand new phone for $500 CAD on Manny's store and decides to pay in Bitcoin.
+
+* The E-Commerce website plugin requests the creation of an invoice from PROCCO.
+* PROCCO queries the "address source URI" and retrieves the rate, the expiration of this rate and conditions.
+* PROCCO generates a LN invoice on Payment Checkout page.
+* Carla pays.  PROCCO marks the payment as paid/finalized. Manny sees the order has been paid and processes the order as usual.
+* PROCCO sends a API request to sell the same amount of bitcoin to MYCOIN
+* Manny’s exposure to cryptocurrency price fluctuations has not increased despite receiving payments in bitcoin.
+
+Atlernatively, if the exchange is also on the lightning network, the merchant can continue to run their own channel and use COX to initiate a LN transfer to the exchange in a manner identical to Case II.   This may be preferable to the process above as it eliminiates the need for a margin account.
+
+
 ==Specification==
 
-The payment processor sends a POST request to the "address source URI", the response from a Crypto Open Exchange Protocol exchange would be:
+The payment processor sends a POST request to the "address source URI". 
+
+If the address source provides LN addresses then the amount is required.
+    {
+        “amount”: 500.00,
+        “currencyCode”:”CAD”,
+    }
+
+
+The response from a Crypto Open Exchange Protocol exchange would be:
 
 If the exchange does not guarantee the rate:
 
@@ -108,8 +147,10 @@ If the exchange does not guarantee the rate:
         "currencyCode" : "CAD",
         "cryptoCurrencyCode" : "BTC",
         "rate" : "15600",
+        "validUntil" : timestamp,   # for LN only
+	      “cryptoAmmount: 0.1, #for LN only
         # When the merchant account get credited on the exchange
-        "requiredConfirmations" : blockcount
+        "requiredConfirmations" : blockcount   #for onchain only
     }
 
 
@@ -120,6 +161,8 @@ If the exchange guarantees the rate:
         "currencyCode" : "CAD",
         "cryptoCurrencyCode" : "BTC",
         "rate" : "15600",
+        "validUntil" : timestamp,   # for LN only
+	      “cryptoAmmount: 0.1, #for LN only
         "requiredConfirmations" : blockcount,
         "conditions" : 
         {
@@ -131,7 +174,7 @@ If the exchange guarantees the rate:
     }
 
 
-When the payment hits the mempool, the exchange sends the following POST to the processor's webhook URI:
+For onchain payments the exchange will send an update when the payment hits the mempool.  The exchange sends the following POST to the processor's webhook URI:
 
   {
         "depositAddress" : "13....abd",
@@ -143,7 +186,7 @@ When the payment hits the mempool, the exchange sends the following POST to the 
   }
 
 
-When the payment is considered confirmed, the exchange sends the following POST to the processor's webhook URI:
+When the payment is considered confirmed or a LN payment is received, the exchange sends the following POST to the processor's webhook URI:
 
   {
         "depositAddress" : "13....abd",
@@ -160,6 +203,11 @@ When the payment is considered confirmed, the exchange sends the following POST 
   }
 
 The payment processor will use the postback information to determine if the invoice is paid and to alert the merchant and customer to any issues (e.g. if the payment amount is wrong, it was sent/confirmed too late, etc).
+
+In the case where the payment is received on the merchant’s LN channel, the Payment Process has the ability to initiate a sell order on the exchange to limit the merchants overall cryptocurrency risk.
+
+SPEC – TBD but basically the payment processor would send a crypto amount to an exchange endpoint.  Exchange would want to have strong limits in place – order amount, daily volume, velocity, etc to ensure its not abused.  These could be configured when the endpoint is setup.
+
 
 ==Note on adoption==
 
