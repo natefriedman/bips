@@ -101,13 +101,13 @@ Now a customer, Carol, wants to order a brand new phone for $500 CAD on Manny's 
 * MYCOIN, under its own policy (typically after 6 confirmations), credits Manny's account of 0.01 BTC and simultaneously creates a market sell order of 0.007 BTC on behalf of Manny.   MYCOIN notifies PROCCO that the payment was confirmed and finalized via the webhook.
 * PROCCO marks the payment as paid/finalized.   Manny sees the order has been paid and processes the order as usual.
 
-===Case II: Merchant uses exchange’s LN=== 
+===Case II: Merchant uses exchange’s Lightning Network=== 
 
 In this case, the Payment Processor requests a LN address from the exchange.  The exchange keeps the Payment Processor up-to-date on payment status and sells the funds as configured.
 
 The steps are identical to Case I except LN addresses are sent instead of Bitcoin.
 
-===Case III: Merchant uses their own LN===
+===Case III: Merchant uses their own Lightning Network===
 
 In this case, the Merchant receives payments via their own LN channels.   COX is used to mitigate exchange risk by initiating sell orders on the merchant’s exchange account.  The exchange may offer the merchant the ability to short bitcoin so as they accumulate bitcoin in their channel their overall position remains the same.
 
@@ -178,8 +178,8 @@ For onchain payments the exchange will send an update when the payment hits the 
         "depositAddress" : "13....abd",
         "cryptoAmountReceived" : "0.01",
         "receivedTimestamp" : timestamp,
-        "rateGuarenteedInEffect" : "false",
-        # When exchange provided a guarenteed rate and the conditions were not met
+        "rateGuaranteedInEffect" : "false",
+        # When exchange provided a guaranteed rate and the conditions were not met
         "conditionFailure" : "Received after window"
   }
 
@@ -194,9 +194,9 @@ When the payment is considered confirmed or a LN payment is received, the exchan
         "cryptoAmountReceived" : "0.01",
         "receivedTimestamp" : timestamp,
         "confirmedTimestamp" : timestamp,
-        # When exchange provided a guarenteed rate
-        "guarenteedRateReceived" : "false",
-        # When exchange provided a guarenteed rate and the conditions were not met
+        # When exchange provided a guaranteed rate
+        "guaranteedRateReceived" : "false",
+        # When exchange provided a guaranteed rate and the conditions were not met
         "conditionFailure" : "Received after window"
   }
 
