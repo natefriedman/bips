@@ -131,8 +131,8 @@ The payment processor sends a POST request to the "address source URI".
 
 If the address source provides LN addresses then the amount is required.
     {
-        “amount”: 500.00,
-        “currencyCode”:”CAD”,
+        "amount": 500.00,
+        "currencyCode":"CAD",
     }
 
 
@@ -146,7 +146,7 @@ If the exchange does not guarantee the rate:
         "cryptoCurrencyCode" : "BTC",
         "rate" : "15600",
         "validUntil" : timestamp,   # for LN only
-	      “cryptoAmmount: 0.1, #for LN only
+	"cryptoAmmount": 0.1, #for LN only
         # When the merchant account get credited on the exchange
         "requiredConfirmations" : blockcount   #for onchain only
     }
@@ -160,7 +160,7 @@ If the exchange guarantees the rate:
         "cryptoCurrencyCode" : "BTC",
         "rate" : "15600",
         "validUntil" : timestamp,   # for LN only
-	      “cryptoAmmount: 0.1, #for LN only
+	"cryptoAmmount": 0.1, #for LN only
         "requiredConfirmations" : blockcount,
         "conditions" : 
         {
