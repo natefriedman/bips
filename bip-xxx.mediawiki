@@ -202,10 +202,35 @@ When the payment is considered confirmed or a LN payment is received, the exchan
 
 The payment processor will use the postback information to determine if the invoice is paid and to alert the merchant and customer to any issues (e.g. if the payment amount is wrong, it was sent/confirmed too late, etc).
 
-In the case where the payment is received on the merchant’s LN channel, the Payment Process has the ability to initiate a sell order on the exchange to limit the merchants overall cryptocurrency risk.
+In the case where the payment is received on the merchant’s LN channel, the Payment Processor has the ability to initiate a sell order on the exchange to limit the merchant's overall cryptocurrency risk.   During the initial setup of this capability, it would be desirable for the exchange to allow the merchant to configure the sell endpoint with limits that protect against abuse.   Limits on the number of sell orders, the maximum per order and per day, and a maximum order rate (per hour) are parameters merchants would readily know and help limit the damage that can be done either by erros in the Payment Processor or by hackers. 
 
-SPEC – TBD but basically the payment processor would send a crypto amount to an exchange endpoint.  Exchange would want to have strong limits in place – order amount, daily volume, velocity, etc to ensure its not abused.  These could be configured when the endpoint is setup.
+The Payment Processor sends a POST sell request to the "address source URI".
 
+	{
+		"requestType" : "sell.order"
+		"cryptoCurrencyCode" : "BTC",
+		"amount": 0.10,
+		"orderType": "limit", #defined by exchange
+		"limitPrice": 9000.00 #defined by exchange, in this example currency is predefined when the endpoint is configured  
+	}
+
+The exchange would respond as to whether order is placed:
+
+	{
+		"id": "ABC123",           
+		"description": "order.received",
+		"status":"submitted"
+	}
+
+The exchange would then update the Payment Processor when the order is executed or updated via a postback:
+
+	{
+		"id": "ABC123",
+		"description": "order.updated",
+		"status":"complete",
+		"price":9001.23,     
+		"amount":0.10    #depending on the exchange rules, partial sales may be possible
+	}
 
 ==Note on adoption==
 
