@@ -146,7 +146,7 @@ If the exchange does not guarantee the rate:
         "cryptoCurrencyCode" : "BTC",
         "rate" : "15600",
         "validUntil" : timestamp,   # for LN only
-	"cryptoAmmount": 0.1, #for LN only
+        "cryptoAmount": 0.1, #for LN only
         # When the merchant account get credited on the exchange
         "requiredConfirmations" : blockcount   #for onchain only
     }
@@ -154,22 +154,22 @@ If the exchange does not guarantee the rate:
 
 If the exchange guarantees the rate:
 
-    {
+  {
         "depositAddress" : "13....abd",
         "currencyCode" : "CAD",
         "cryptoCurrencyCode" : "BTC",
         "rate" : "15600",
         "validUntil" : timestamp,   # for LN only
-	"cryptoAmmount": 0.1, #for LN only
+        "cryptoAmount": 0.1, #for LN only
         "requiredConfirmations" : blockcount,
         "conditions" : 
-        {
+     {
             # When the transaction should be seen on the blockchain to guarantee the rate
             "receivedBefore" : timestamp,
             # When the transaction should be confirmed on the blockchain to guarantee the rate
             "confirmedBefore" : timestamp
-        }
-    }
+     }     
+  }
 
 
 For onchain payments the exchange will send an update when the payment hits the mempool.  The exchange sends the following POST to the processor's webhook URI:
@@ -206,31 +206,31 @@ In the case where the payment is received on the merchant’s LN channel, the Pa
 
 The Payment Processor sends a POST sell request to the "address source URI".
 
-	{
-		"requestType" : "sell.order"
-		"cryptoCurrencyCode" : "BTC",
-		"amount": 0.10,
-		"orderType": "limit", #defined by exchange
-		"limitPrice": 9000.00 #defined by exchange, in this example currency is predefined when the endpoint is configured  
-	}
+    {
+        "requestType" : "sell.order"
+        "cryptoCurrencyCode" : "BTC",
+        "amount": 0.10,
+        "orderType": "limit", #defined by exchange
+        "limitPrice": 9000.00 #defined by exchange, in this example currency is predefined when the endpoint is configured  
+    }
 
 The exchange would respond as to whether order is placed:
 
-	{
-		"id": "ABC123",           
-		"description": "order.received",
-		"status":"submitted"
-	}
+    {
+        "id": "ABC123",           
+        "description": "order.received",
+        "status":"submitted"
+    }
 
 The exchange would then update the Payment Processor when the order is executed or updated via a postback:
 
-	{
-		"id": "ABC123",
-		"description": "order.updated",
-		"status":"complete",
-		"price":9001.23,     
-		"amount":0.10    #depending on the exchange rules, partial sales may be possible
-	}
+    {
+        "id": "ABC123",
+        "description": "order.updated",
+        "status":"complete",
+        "price":9001.23,     
+        "amount":0.10    #depending on the exchange rules, partial sales may be possible
+    }
 
 ==Note on adoption==
 
